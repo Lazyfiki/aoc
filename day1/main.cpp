@@ -1,36 +1,46 @@
-#include <cctype>
-#include <cstring>
 #include <iostream>
 #include <string>
-#include <map>
-#include <fstream>
 #include <vector>
+#include <fstream>
 
-std::vector<std::string> spelled = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
+const std::vector<std::pair<std::string, int>> spelled = {
+    {"one", 1}, {"two", 2}, {"three", 3}, {"four", 4}, {"five", 5}, {"six", 6},
+    {"seven", 7}, {"eight", 8}, {"nine", 9}
+};
 
-int main(void) {
-    std::ifstream file("test.txt");
+std::vector<std::string> extractDigitsAndSpelled(const std::string& content) {
+    std::vector<std::string> result;
+    int n = content.length();
+
+    for (int i = 0; i < n; ++i) {
+        if (isdigit(content[i])) {
+            result.push_back(std::string(1, content[i]));
+        } else {
+            for (const auto& entry : spelled) {
+                const std::string& spelledNumber = entry.first;
+                if (content.substr(i, spelledNumber.length()) == spelledNumber) {
+                    result.push_back(std::to_string(entry.second));
+                    i += spelledNumber.length() - 1;
+                    break;
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+int main() {
+    std::ifstream file("input.txt");
     std::string content;
     int res = 0;
 
     while (std::getline(file, content)) {
-        int n = content.length();
-        std::vector<char> digits;
-
-        for (int i = 0; i < n; ++i) {
-            if (isdigit(content[i])) {
-                digits.push_back(content[i]);
-            }
-            for (int j = 0; i < spelled.size(); ++j) {
-                if (content.substr(i, n).find(spelled[j]) != -1) {
-                    digits.push_back(j+1+'0');
-                }
-            }
-        }
-        if (!digits.empty()) {
-            std::string s = {digits.front(), digits.back()};
-            res += std::stoi(s);
-        }
+        std::vector<std::string> result = extractDigitsAndSpelled(content);
+        std::string s = result.front() + result.back();
+        res += std::stoi(s);
     }
     std::cout << res << '\n';
+    return 0;
 }
+
