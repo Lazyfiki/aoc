@@ -2,56 +2,52 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include <string>
+#include <vector>
 
-const int rMax = 12;
-const int gMax = 13;
-const int bMax = 14;
+std::map<std::string, int> max = {
+    {"green", 13},
+    {"blue", 14},
+    {"red", 12},
+};
 
-std::map<char, int> rgb(std::string content) {
-    int n = content.length();
-    std::map<char, int> rgbVal = {
-        {'r', 0},
-        {'g', 0},
-        {'b', 0},
-    };
-
-    std::string buf = "";
-    for (int i = 0; i < content.length(); ++i) {
-        char c = content[i];
-        if (isdigit(c)) {
-            buf += c;
-        } else if (c == 'r' || c == 'g' || c == 'b') {
-            try {
-                rgbVal[c] += std::stoi(buf);
-                buf = "";
-            } catch (const std::invalid_argument& e) {
-                std::cerr << "Invalid argument: " << e.what() << " for character '" << c << "' at position " << i << std::endl;
-            } catch (const std::out_of_range& e) {
-                std::cerr << "Out of range: " << e.what() << " for character '" << c << "' at position " << i << std::endl;
-            }
-        }
-    };
-    return rgbVal;
+std::vector<std::string> split(const std::string& s, char delimiter) {
+    std::vector<std::string> tokens;
+    size_t start = 0, end = 0;
+    while ((end = s.find(delimiter, start)) != std::string::npos) {
+        tokens.push_back(s.substr(start, end - start));
+        start = end + 1;
+    }
+    tokens.push_back(s.substr(start));
+    return tokens;
 }
 
 int main(void) {
     std::ifstream file("input.txt");
     std::string content = "";
-    int idx = 1;
     int res = 0;
 
     while (std::getline(file, content)) {
+        bool valid = true;
         int n = content.length();
-        size_t pos = content.find(":");
-        content = content.substr(pos+2, n);
-        std::cout << idx << ' ' << content << '\n';
+        const int gameId = std::stoi(split(split(content, ':')[0], ' ')[1]);
 
-        std::map<char, int> rgbVal = rgb(content);
-        if ( rgbVal['r'] <= rMax && rgbVal['g'] <= gMax && rgbVal['b'] <= bMax) {
-            res += idx;
+        std::vector<std::string> games = split(split(content, ':')[1], ';');
+        for (std::string s : games) {
+            std::vector<std::string> die = split(s, ',');
+            for (std::string d : die) {
+                const std::string count = split(d, ' ')[1];
+                const std::string color = split(d, ' ')[2];
+
+                if (std::stoi(count) > max[color]) {
+                    valid = false;
+                }
+            }
         }
 
-        idx++;
+        if (valid) {
+            res += gameId;
+        }
     }
     std::cout << res << '\n';
 }
