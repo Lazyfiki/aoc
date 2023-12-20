@@ -6,9 +6,9 @@
 #include <vector>
 
 std::map<std::string, int> max = {
-    {"green", 13},
-    {"blue", 14},
-    {"red", 12},
+    {"green", 0},
+    {"blue", 0},
+    {"red", 0},
 };
 
 std::vector<std::string> split(const std::string& s, char delimiter) {
@@ -28,7 +28,6 @@ int main(void) {
     int res = 0;
 
     while (std::getline(file, content)) {
-        bool valid = true;
         int n = content.length();
         const int gameId = std::stoi(split(split(content, ':')[0], ' ')[1]);
 
@@ -40,14 +39,16 @@ int main(void) {
                 const std::string color = split(d, ' ')[2];
 
                 if (std::stoi(count) > max[color]) {
-                    valid = false;
+                    max[color] = std::stoi(count);
                 }
             }
         }
-
-        if (valid) {
-            res += gameId;
-        }
+        res += max["red"] * max["green"] * max["blue"];
+        max = {
+            {"green", 0},
+            {"blue", 0},
+            {"red", 0},
+        };
     }
     std::cout << res << '\n';
 }
