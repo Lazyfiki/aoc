@@ -3,6 +3,11 @@
 #include <string>
 #include <vector>
 
+typedef struct {
+    std::string value;
+    int mult;
+} card;
+
 std::vector<std::string> split(const std::string& s, char delimiter) {
     std::vector<std::string> tokens;
     size_t start = 0, end = 0;
@@ -15,39 +20,55 @@ std::vector<std::string> split(const std::string& s, char delimiter) {
 }
 
 int main(void) {
-    std::ifstream file("input");
+    std::ifstream file("test.txt");
     std::string content;
+    std::vector<card> arr;
 
     int points = 0;
 
     while (std::getline(file, content)) {
-        content = split(content, ':')[1];
-        std::vector<std::string> cards = split(split(content, '|')[0], ' ');
+        card c;
+        c.value = content;
+        c.mult = 1;
+        arr.push_back(c);
+    }
+
+    int n = arr.size();
+
+    for (int i = 0; i < n; ++i) {
+        std::string s = split(arr[i].value, ':')[1];
+        std::vector<std::string> cards = split(split(s, '|')[0], ' ');
         int cardsLength = cards.size();
-        std::vector<std::string> winning = split(split(content, '|')[1], ' ');
+        std::vector<std::string> winning = split(split(s, '|')[1], ' ');
         int winningLength = winning.size();
 
         int currPoints = 0;
-
         for (int i = 0; i < cardsLength; ++i) {
             for (int j = 0; j < winningLength; ++j) {
                 if (!(cards[i].empty() || winning[j].empty())) {
                     int cardV = std::stoi(cards[i]);
                     int winningV = std::stoi(winning[j]);
                     if (cardV == winningV) {
-                        std::cout << "card:" << cardV << " winning:" << winning[j] << '\n';
-                        if (currPoints == 0) {
-                            currPoints++;
-                        } else {
-                            currPoints *= 2;
-                        }
+                        currPoints++;
                     }
                 }
             }
         }
-        points += currPoints;
+
+        for (int j = 0; j < currPoints; ++j) {
+            arr[i+j+1].mult *= 2;
+            //arr.push_back(arr[i+j+1]);
+        }
+
+        // std::cout << currPoints << '\n';
+        // points += currPoints;
     }
 
+    for (int i = 0; i < arr.size(); ++i) {
+        std::cout << arr[i].value;
+        std::cout << " M: " << arr[i].mult << '\n';
+        points += arr[i].mult;
+    }
 
     std::cout << points << '\n';
     return 0;
