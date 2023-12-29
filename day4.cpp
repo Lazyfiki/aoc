@@ -20,7 +20,7 @@ std::vector<std::string> split(const std::string& s, char delimiter) {
 }
 
 int main(void) {
-    std::ifstream file("test.txt");
+    std::ifstream file("input");
     std::string content;
     std::vector<card> arr;
 
@@ -33,9 +33,7 @@ int main(void) {
         arr.push_back(c);
     }
 
-    int n = arr.size();
-
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < arr.size(); ++i) {
         std::string s = split(arr[i].value, ':')[1];
         std::vector<std::string> cards = split(split(s, '|')[0], ' ');
         int cardsLength = cards.size();
@@ -56,12 +54,10 @@ int main(void) {
         }
 
         for (int j = 0; j < currPoints; ++j) {
-            arr[i+j+1].mult *= 2;
-            //arr.push_back(arr[i+j+1]);
+            int n = i+j+1;
+            arr[n].mult = arr[n].mult + arr[i].mult;
         }
 
-        // std::cout << currPoints << '\n';
-        // points += currPoints;
     }
 
     for (int i = 0; i < arr.size(); ++i) {
