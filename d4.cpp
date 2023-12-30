@@ -57,7 +57,6 @@ int main(void) {
             int n = i+j+1;
             arr[n].mult = arr[n].mult + arr[i].mult;
         }
-
     }
 
     for (int i = 0; i < arr.size(); ++i) {
